@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../static/house.css">
+    <title>House Price Prediction</title>
+</head>
+<body>
+    <header>House Price Prediction</header>
+    <div class="form">
+        <form class="form-cards" id="predictionForm">
+            <div>
+                <label for="area">Area in square feet-sqft:</label>
+                <input type="number" id="area" name="area" required>
+            </div>
+            <div>
+                <label for="number_of_bedrooms">Number of Bed Rooms:</label>
+                <input type="number" id="number_of_bedrooms" name="number_of_bedrooms" required>
+            </div>
+            <div>
+                <label for="number_of_bathrooms">Number of Bath Rooms:</label>
+                <input type="number" id="number_of_bathrooms" name="number_of_bathrooms" required>
+            </div>
+            <div>
+                <button type="submit" class="button" id="predictButton">Predict Price</button>
+            </div>
+        </form>
+        <h2 id="result"></h2>
+    </div>
+    <script>
+        document.getElementById('predictionForm').addEventListener('submit', function(event) {
+            event.preventDefault();  // Prevent form from submitting the default way
+
+            // Collect form data
+            let formData = {
+                Area: document.getElementById('area').value,
+                No_Of_Bedrooms: document.getElementById('number_of_bedrooms').value,
+                No_Of_Bathrooms: document.getElementById('number_of_bathrooms').value
+            };
+
+            console.log(formData);  // Debug print
+
+            // Send data to the server
+            fetch('/predict', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(formData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    document.getElementById('result').innerText = `Error: ${data.error}`;
+                } else {
+                    // Update the result div with the prediction
+                    document.getElementById('result').innerText = `Predicted Price: ${data.prediction.toFixed(2)}`;
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                document.getElementById('result').innerText = 'Error: An error occurred while predicting the price.';
+            });
+        });
+    </script>
+</body>
+</html>
